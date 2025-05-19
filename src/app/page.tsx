@@ -9,7 +9,6 @@ export default function Home() {
           Una app para equipos de atencion domiciliaria
         </p>
         <Link className="text-center" href="/dashboard">
-          {" "}
           ir a Dashboard
         </Link>
       </main>
