@@ -17,7 +17,8 @@ const AddPatientForm: React.FC = () => {
     reset,
     formState: { errors },
   } = useForm<PatientFormData>({
-    resolver: zodResolver(patientFormSchema),
+    //resolver: zodResolver(patientFormSchema),
+    defaultValues: { name: "" },
   });
 
   const onSubmit = async (data: PatientFormData) => {
