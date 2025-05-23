@@ -1,11 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  patientFormSchema,
-  PatientFormData,
-} from "@/schemas/patientFormSchema";
+//import { zodResolver } from "@hookform/resolvers/zod";
+import { PatientFormData } from "@/schemas/patientFormSchema";
 import { supabase } from "@/lib/supabase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
