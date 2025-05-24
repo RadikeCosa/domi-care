@@ -1,65 +1,65 @@
+// src/components/AddPatientForm.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
-//import { zodResolver } from "@hookform/resolvers/zod";
-import { PatientFormData } from "@/schemas/patientFormSchema";
-import { supabase } from "@/lib/supabase";
-import { ToastContainer, toast } from "react-toastify";
+import { createPatient, PatientState } from "@/lib/actions";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTransition } from "react";
 
-const AddPatientForm: React.FC = () => {
+interface FormData {
+  name: string;
+}
+
+const toastOptions = {
+  position: "top-right" as const,
+  autoClose: 3000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+};
+
+export default function AddPatientForm() {
+  const [isPending, startTransition] = useTransition();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<PatientFormData>({
-    //resolver: zodResolver(patientFormSchema),
+  } = useForm<FormData>({
     defaultValues: { name: "" },
   });
 
-  const onSubmit = async (data: PatientFormData) => {
-    const partialData = { name: data.name }; // solo el campo que ya pedimos
-
-    const { error } = await supabase.from("patients").insert([partialData]);
-
-    if (error) {
-      toast.error(`Error al guardar: ${error.message}`, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      console.error("Error al guardar:", error.message);
-    } else {
-      toast.success("Paciente guardado con éxito", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      reset();
-    }
+  const onSubmit = (data: FormData) => {
+    startTransition(async () => {
+      const result: PatientState = await createPatient({ message: null }, data);
+      if (result.errors || result.message) {
+        toast.error(
+          result.message || "Error al guardar el paciente",
+          toastOptions
+        );
+      } else {
+        toast.success("Paciente guardado con éxito", toastOptions);
+        reset();
+      }
+    });
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-md space-y-4">
-        {/* Nombre */}
+    <div className="max-w-md mx-auto p-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="flex flex-col">
           <label htmlFor="name" className="text-sm font-medium mb-1">
             Nombre del paciente
           </label>
           <input
             id="name"
-            {...register("name")}
+            {...register("name", { required: "El nombre es requerido" })}
             className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 ${
               errors.name ? "border-red-500" : "border-gray-300"
             }`}
+            disabled={isPending}
           />
           {errors.name && (
             <span className="text-sm text-red-500 mt-1">
@@ -67,19 +67,15 @@ const AddPatientForm: React.FC = () => {
             </span>
           )}
         </div>
-
-        {/* Repetir este bloque para dni, birthDate, address, phone, email */}
-
         <button
           type="submit"
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
+          className="px-4 py-2 border rounded-md hover:bg-gray-100 disabled:opacity-50"
+          disabled={isPending}
         >
-          Agregar paciente
+          {isPending ? "Guardando..." : "Agregar paciente"}
         </button>
       </form>
       <ToastContainer />
     </div>
   );
-};
-
-export default AddPatientForm;
+}

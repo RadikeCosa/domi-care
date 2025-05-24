@@ -1,7 +1,7 @@
 // src/app/dashboard/page.tsx
 import Link from "next/link";
-import PatientList from "@/components/patientList"; // Assuming this is the location of your patient list component
-import AddPatientForm from "@/components/addPatientForm"; // Assuming this is the location of your form
+import PatientList from "@/components/patientList";
+import AddPatientForm from "@/components/addPatientForm";
 
 export default function Dashboard() {
   return (
@@ -16,7 +16,7 @@ export default function Dashboard() {
           </Link>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6">
         <div className="mb-8">
           <AddPatientForm />
         </div>
